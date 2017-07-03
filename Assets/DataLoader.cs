@@ -14,7 +14,7 @@ public class DataLoader : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-
+        return;
         GetFlightsData();
         //StartCoroutine(GetFlightsData());
     }

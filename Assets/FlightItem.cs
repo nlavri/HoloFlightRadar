@@ -78,18 +78,18 @@ namespace Assets
         {
             var result = new FlightItem();
 
-            result.Icao24 = array[0].Value;
-            result.CallSign = array[1].Value;
-            result.OriginCountry = array[2].Value;
-            result.TimePosition = array[3].AsInt; 
-            result.TimeVelocity = array[4] as long?; 
-            result.Longitude = array[5] as float?; 
-            result.Latitude = array[6] as float?; 
-            result.Altitude = array[7] as float?; 
-            result.OnGround = (bool)array[8]; 
-            result.Velocity = array[9] as float?; 
-            result.Heading = array[10] as float?; 
-            result.VerticalRotates = array[11] as float?; 
+            result.Icao24 = array[0].IsNull ? null : array[0].Value;
+            result.CallSign = array[1].IsNull ? null : array[1].Value;
+            result.OriginCountry = array[2].IsNull ? null : array[2].Value;
+            result.TimePosition = array[3].IsNull ? (int?)null : array[3].AsInt; 
+            result.TimeVelocity = array[4].IsNull ? (int?)null : array[4].AsInt; 
+            result.Longitude = array[5].IsNull ? (float?)null : array[5].AsFloat;
+            result.Latitude = array[6].IsNull ? (float?)null : array[6].AsFloat;
+            result.Altitude = array[7].IsNull ? (float?)null : array[7].AsFloat;
+            result.OnGround = !array[8].IsNull && array[8].AsBool;
+            result.Velocity = array[9].IsNull ? (float?)null : array[9].AsFloat;
+            result.Heading = array[10].IsNull ? (float?)null : array[10].AsFloat;
+            result.VerticalRotates = array[11].IsNull ? (float?)null : array[11].AsFloat;
             result.SensorIds = new int[0];
 
             return result;
