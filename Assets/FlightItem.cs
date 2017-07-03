@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using SimpleJSON;
 
 namespace Assets
 {
@@ -72,14 +74,14 @@ namespace Assets
         /// </summary>
         public int[] SensorIds { get; set; }
 
-        public static FlightItem FromArray(object[] array)
+        public static FlightItem FromArray(JSONArray array)
         {
             var result = new FlightItem();
 
-            result.Icao24 = array[0] as string; 
-            result.CallSign = array[1] as string; 
-            result.OriginCountry = array[2] as string; 
-            result.TimePosition = array[3] as long?; 
+            result.Icao24 = array[0].Value;
+            result.CallSign = array[1].Value;
+            result.OriginCountry = array[2].Value;
+            result.TimePosition = array[3].AsInt; 
             result.TimeVelocity = array[4] as long?; 
             result.Longitude = array[5] as float?; 
             result.Latitude = array[6] as float?; 

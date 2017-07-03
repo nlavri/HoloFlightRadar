@@ -1,14 +1,18 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
 namespace Assets
 {
+    [Serializable]
     public class FlightsDataReponse
     {
-        public long Time { get; set; }
-        public object[][] States { get; set; }
+        public long time;
 
+        public string[][] states;
     }
+
+
 }

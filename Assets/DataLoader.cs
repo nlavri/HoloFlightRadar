@@ -1,19 +1,14 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using Assets;
-using Newtonsoft.Json;
+using SimpleJSON;
+//using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
 
 public class DataLoader : MonoBehaviour
 {
-    private WebClient webClient;
-    private FlightsDataReponse flightsDataReponse;
-
     public GameObject earth;
 
     // Use this for initialization
@@ -33,7 +28,7 @@ public class DataLoader : MonoBehaviour
             webRequest.Send();
             while (!webRequest.isDone && !webRequest.isError)
             {
-                
+
             }
 
             if (webRequest.isError)
@@ -48,13 +43,20 @@ public class DataLoader : MonoBehaviour
 
                 try
                 {
-                
-                    flightsDataReponse = JsonConvert.DeserializeObject<FlightsDataReponse>(downloadHandlerText);
-                    Debug.Log(flightsDataReponse.Time);
-                    if (flightsDataReponse.States != null)
+
+                    //flightsDataReponse = JsonConvert.DeserializeObject<FlightsDataReponse>(downloadHandlerText);
+                    var json = JSON.Parse(downloadHandlerText);
+                    Debug.Log(json["time"]);
+                    var states = json["states"].AsArray;
+                    if (states != null)
                     {
-                        Debug.Log(flightsDataReponse.States.Length);
-                        var result = flightsDataReponse.States.Select(FlightItem.FromArray).ToList();
+                        //foreach (JSONNode jsonNode in states)
+                        //{
+                        //    var itemArray = jsonNode.AsArray;
+                        //    Debug.Log(itemArray[0]);
+                        //}
+                        var result = states.Cast<JSONNode>().Select(x => FlightItem.FromArray(x.AsArray)).ToList();
+                        Debug.Log(result.First().Icao24);
                     }
                 }
                 catch (Exception e)
