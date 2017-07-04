@@ -10,18 +10,18 @@ using UnityEngine.Networking;
 public class DataLoader : MonoBehaviour
 {
     public GameObject earth;
+    public GameObject plane;
 
     // Use this for initialization
     void Start()
     {
-        return;
         GetFlightsData();
         //StartCoroutine(GetFlightsData());
     }
 
     IEnumerator GetFlightsData()
     {
-        while (true)
+        //while (true)
         {
             var webRequest = UnityWebRequest.Get("https://nlavri:nlavriPass55@opensky-network.org/api/states/all");
             //yield return webRequest.Send();
@@ -43,20 +43,57 @@ public class DataLoader : MonoBehaviour
 
                 try
                 {
-
-                    //flightsDataReponse = JsonConvert.DeserializeObject<FlightsDataReponse>(downloadHandlerText);
                     var json = JSON.Parse(downloadHandlerText);
                     Debug.Log(json["time"]);
                     var states = json["states"].AsArray;
                     if (states != null)
                     {
-                        //foreach (JSONNode jsonNode in states)
-                        //{
-                        //    var itemArray = jsonNode.AsArray;
-                        //    Debug.Log(itemArray[0]);
-                        //}
                         var result = states.Cast<JSONNode>().Select(x => FlightItem.FromArray(x.AsArray)).ToList();
-                        Debug.Log(result.First().Icao24);
+                        var flightItems = result.FirstOrDefault(x => x.Icao24 == "00b22b");
+                        //flightItems.Add(new FlightItem()
+                        //{
+                        //    Latitude = 55.3465f,
+                        //    Longitude = 36.9037f,
+                        //    CallSign = "REDITEM"
+                        //});
+                        //lat = 37.8511 long= 56.9136
+                        foreach (var flightItem in new[] { flightItems })
+                        {
+                            if (this.earth != null && this.plane != null && flightItem.Latitude.HasValue && flightItem.Longitude.HasValue)
+                            {
+                                Debug.Log(flightItem.Latitude);
+                                Debug.Log(flightItem.Longitude);
+
+                                var scaleX = this.earth.transform.localScale.x;
+                                var radius = this.earth.GetComponent<SphereCollider>().radius;
+
+                                var transformPosition =
+                                    Quaternion.AngleAxis(flightItem.Latitude.Value, -Vector3.right) *
+                                    Quaternion.AngleAxis(flightItem.Longitude.Value , -Vector3.up) *
+
+                                    //Quaternion.AngleAxis(this.earth.transform.rotation.eulerAngles.y, Vector3.back) *
+
+                                    new Vector3(0, 0, radius * scaleX);
+
+
+                                Debug.Log(transformPosition);
+
+                                var copy = Instantiate(this.plane);
+                                copy.transform.position = this.earth.transform.position + transformPosition;
+
+                                var normal = (copy.transform.position - this.earth.transform.position).normalized;
+                                // Here we work out what direction should be pointing forwards.
+                                Vector3 forwardsVector =
+                                    Vector3.Cross(normal,
+                                        new Vector3(Mathf.Cos(Mathf.Deg2Rad * flightItem.Heading.Value),
+                                            Mathf.Sin(Mathf.Deg2Rad * flightItem.Heading.Value)));
+                                // Finally, compose the two directions back into a single rotation.
+                                copy.transform.rotation = Quaternion.LookRotation(forwardsVector, normal);
+
+
+                            }
+                        }
+
                     }
                 }
                 catch (Exception e)
@@ -67,6 +104,7 @@ public class DataLoader : MonoBehaviour
 
             }
         }
+        return null;
     }
 
     // Update is called once per frame
